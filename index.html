@@ -40,64 +40,38 @@ button,input{font:inherit}.app{min-height:100vh}.top{background:var(--navy);colo
 </main>
 </div>
 <div class="modal" id="modal"><div class="modal-box"><h3 id="modalTitle">Add area</h3><div id="formFields"></div><div class="modal-actions"><button class="btn" id="cancel">Cancel</button><button class="btn primary" id="save">Save</button></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL="https://kssrnwfwijlwustnbngc.supabase.co";
+const SUPABASE_KEY="sb_publishable_fLICDH3QXCg6i0NzB7SXSA_qR_DttpM";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const defaultAreas=["Homestead","Miami Beach","Coral Springs","Port Charlotte","Bradenton","Bonita Springs","Port St. Lucie","Boca Raton","Boynton Beach","Miami","Hollywood","Hialeah","Miramar","Coral Gables","Cape Coral","Naples","Fort Pierce","Fort Lauderdale","Vero Beach","St. Petersburg","Key West","West Palm Beach","Sarasota","Ft. Myers"];
-let areas=JSON.parse(localStorage.getItem("flAreas")||"null")||defaultAreas.map((name,i)=>({id:i+1,name,comp:i<2?"":i===17?"Elder & Young":""}));
-let selected="Fort Lauderdale";
+let areas=[];let selected="Fort Lauderdale";let currentUser=null;
 const data={cars:[],houses:[],numbers:[],companionships:[]};
 const schemas={cars:["Year","Make","Model","VIN","Plate","Assigned Area"],houses:["House Name","Address","Capacity","Keys","Assigned Area"],numbers:["Location","Phone","Notes","Assigned Area"],companionships:["Missionaries","Assigned Area","Notes","PDF"]};
-function save(){localStorage.setItem("flAreas",JSON.stringify(areas))}
-function renderAreas(){
- const q=document.getElementById("search").value.toLowerCase();
- const list=document.getElementById("areaList"); const shown=areas.filter(a=>a.name.toLowerCase().includes(q));
- document.getElementById("areaCount").textContent=areas.length+" areas";
- list.innerHTML=shown.map(a=>'<div class="area '+(a.name===selected?'selected':'')+'" data-name="'+a.name.replaceAll('"','&quot;')+'"><div class="area-row"><span class="area-name">'+a.name+'</span><span class="pill '+(!a.comp?'empty':'')+'">'+(a.comp||"Unassigned")+'</span></div><div class="meta">Car · Phone · Companionship</div></div>').join("");
- list.querySelectorAll(".area").forEach(x=>x.onclick=()=>{selected=x.dataset.name;renderAreas();showAreaDetails()});
-}
-function renderDetail(){
- const a=areas.find(x=>x.name===selected)||{name:selected};
- document.querySelectorAll(".zone").forEach(z=>z.classList.toggle("unassigned",!areas.find(a=>a.name===z.dataset.area)?.comp));
-}
-function showAreaDetails(){
- const a=areas.find(x=>x.name===selected)||{name:selected};
- document.getElementById("mapView").classList.add("hidden");
- document.getElementById("areaDetailView").classList.remove("hidden");
- document.getElementById("workspaceTitle").textContent=a.name;
- document.getElementById("workspaceHint").classList.add("hidden");
- document.getElementById("returnMap").classList.remove("hidden");
- document.getElementById("areaDetailView").innerHTML='<div><div class="area-subtitle">Area assignment</div><h2 style="margin:4px 0 0">'+a.name+'</h2></div><div class="assignment-list"><div class="assignment-row"><div><small>Companionship</small><b>'+(a.comp||"Unassigned")+'</b></div><button class="btn">Assign</button></div><div class="assignment-row"><div><small>Car</small><b>'+(a.car||"Unassigned")+'</b></div><button class="btn">Assign</button></div><div class="assignment-row"><div><small>Phone</small><b>'+(a.phone||"Unassigned")+'</b></div><button class="btn">Assign</button></div><div class="assignment-row"><div><small>House</small><b>'+(a.house||"Unassigned")+'</b></div><button class="btn">Assign</button></div></div>';
-}
-function showMap(){
- document.getElementById("mapView").classList.remove("hidden");
- document.getElementById("areaDetailView").classList.add("hidden");
- document.getElementById("workspaceTitle").textContent="Mission map";
- document.getElementById("workspaceHint").classList.remove("hidden");
- document.getElementById("returnMap").classList.add("hidden");
-}
-function renderTable(tab){
- document.getElementById("viewTitle").textContent=tab[0].toUpperCase()+tab.slice(1);
- document.getElementById("thead").innerHTML="<tr>"+schemas[tab].map(x=>"<th>"+x+"</th>").join("")+"</tr>";
- const rows=data[tab];
- document.getElementById("tbody").innerHTML=rows.length?rows.map(r=>"<tr>"+schemas[tab].map(k=>"<td>"+(r[k]||"—")+"</td>").join("")+"</tr>").join(""):'<tr><td colspan="'+schemas[tab].length+'" class="empty">No records yet. Use “Add record” to begin.</td></tr>';
-}
+const tableMap={cars:"cars",houses:"houses",numbers:"phone_numbers",companionships:"companionships"};
+const authScreen=document.getElementById("authScreen");
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function setAuthMsg(m){document.getElementById("authMsg").textContent=m||""}
+async function signIn(){setAuthMsg("Signing in…");const email=document.getElementById("authEmail").value.trim(),password=document.getElementById("authPassword").value;const {error}=await db.auth.signInWithPassword({email,password});if(error)setAuthMsg(error.message)}
+async function signUp(){setAuthMsg("Creating account…");const email=document.getElementById("authEmail").value.trim(),password=document.getElementById("authPassword").value;if(password.length<6){setAuthMsg("Password must be at least 6 characters.");return}const {error}=await db.auth.signUp({email,password});if(error)setAuthMsg(error.message);else setAuthMsg("Account created. Check your email if confirmation is required, then sign in.")}
+async function boot(){const {data:{session}}=await db.auth.getSession();if(session){currentUser=session.user;await loadApp()}else authScreen.style.display="grid";db.auth.onAuthStateChange(async(_event,session)=>{if(session&&!currentUser){currentUser=session.user;await loadApp()}else if(!session){currentUser=null;authScreen.style.display="grid"}})}
+async function loadApp(){authScreen.style.display="none";document.querySelector(".user").innerHTML=esc(currentUser.email)+'<button class="signout" id="signOut">Sign out</button>';document.getElementById("signOut").onclick=async()=>{await db.auth.signOut()};await loadAreas();await Promise.all(Object.keys(data).map(loadTable));renderAreas();showMap()}
+async function loadAreas(){const {data:rows,error}=await db.from("areas").select("id,name,display_order,companionship_id").order("display_order").order("name");if(error){console.error(error);areas=[];document.getElementById("areaList").innerHTML='<div class="empty">Database setup is not finished yet. Run supabase.sql in the Supabase SQL Editor.</div>';return}areas=rows||[];if(!areas.length){const seed=defaultAreas.map((name,i)=>({name,display_order:i+1}));const ins=await db.from("areas").insert(seed).select("id,name,display_order,companionship_id");if(!ins.error)areas=ins.data||[]}selected=areas.some(a=>a.name===selected)?selected:(areas[0]?.name||"Fort Lauderdale")}
+async function loadTable(tab){const {data:rows,error}=await db.from(tableMap[tab]).select("*").order("created_at",{ascending:false});if(!error)data[tab]=rows||[];else data[tab]=[]}
+function compName(id){return id?((data.companionships.find(c=>c.id===id)?.missionaries)||"Assigned"):"Unassigned"}
+function renderAreas(){const q=(document.getElementById("search").value||"").toLowerCase();const list=document.getElementById("areaList");const shown=areas.filter(a=>a.name.toLowerCase().includes(q));document.getElementById("areaCount").textContent=areas.length+" areas";list.innerHTML=shown.map(a=>'<div class="area '+(a.name===selected?"selected":"")+'" data-name="'+esc(a.name)+'"><div class="area-row"><span class="area-name">'+esc(a.name)+'</span><span class="pill '+(!a.companionship_id?"empty":"")+'">'+esc(compName(a.companionship_id))+'</span></div><div class="meta">Car · Phone · Companionship</div></div>').join("");list.querySelectorAll(".area").forEach(x=>x.onclick=()=>{selected=x.dataset.name;renderAreas();showAreaDetails()})}
+function showAreaDetails(){const a=areas.find(x=>x.name===selected)||{name:selected};document.getElementById("mapView").classList.add("hidden");document.getElementById("areaDetailView").classList.remove("hidden");document.getElementById("workspaceTitle").textContent=a.name;document.getElementById("workspaceHint").classList.add("hidden");document.getElementById("returnMap").classList.remove("hidden");const car=data.cars.find(x=>x.area_id===a.id),phone=data.numbers.find(x=>x.area_id===a.id),house=data.houses.find(x=>x.area_id===a.id);document.getElementById("areaDetailView").innerHTML='<div><div class="area-subtitle">Area assignment</div><h2 style="margin:4px 0 0">'+esc(a.name)+'</h2></div><div class="assignment-list"><div class="assignment-row"><div><small>Companionship</small><b>'+esc(compName(a.companionship_id))+'</b></div></div><div class="assignment-row"><div><small>Car</small><b>'+esc(car?(car.year+" "+car.make+" "+car.model):"Unassigned")+'</b></div></div><div class="assignment-row"><div><small>Phone</small><b>'+esc(phone?(phone.location+" · "+phone.phone):"Unassigned")+'</b></div></div><div class="assignment-row"><div><small>House</small><b>'+esc(house?(house.house_name||house.address):"Unassigned")+'</b></div></div></div>'}
+function showMap(){document.getElementById("mapView").classList.remove("hidden");document.getElementById("areaDetailView").classList.add("hidden");document.getElementById("workspaceTitle").textContent="Mission map";document.getElementById("workspaceHint").classList.remove("hidden");document.getElementById("returnMap").classList.add("hidden")}
+function displayValue(tab,k,r){const m={Year:"year",Make:"make",Model:"model",VIN:"vin",Plate:"plate","House Name":"house_name",Address:"address",Capacity:"capacity",Keys:"keys",Location:"location",Phone:"phone",Notes:"notes",Missionaries:"missionaries",PDF:"pdf_path"};if(k==="Assigned Area")return areas.find(x=>x.id===r.area_id)?.name||"Unassigned";return r[m[k]]||""}
+function renderTable(tab){document.getElementById("viewTitle").textContent=tab[0].toUpperCase()+tab.slice(1);document.getElementById("thead").innerHTML="<tr>"+schemas[tab].map(x=>"<th>"+x+"</th>").join("")+"</tr>";const rows=data[tab];document.getElementById("tbody").innerHTML=rows.length?rows.map(r=>"<tr>"+schemas[tab].map(k=>"<td>"+esc(displayValue(tab,k,r))+"</td>").join("")+"</tr>").join(""):'<tr><td colspan="'+schemas[tab].length+'" class="empty">No records yet. Use “Add record” to begin.</td></tr>'}
+async function addArea(o){if(!o["Area name"])return;const {data:row,error}=await db.from("areas").insert({name:o["Area name"],display_order:areas.length+1,owner_id:currentUser.id}).select().single();if(error){alert(error.message);return}areas.push(row);renderAreas()}
+async function addRecord(tab,o){const area=areas.find(a=>a.name===o["Assigned Area"]);let payload={owner_id:currentUser.id,area_id:area?.id||null};if(tab==="cars")payload={...payload,year:o.Year,make:o.Make,model:o.Model,vin:o.VIN,plate:o.Plate};if(tab==="houses")payload={...payload,house_name:o["House Name"],address:o.Address,capacity:o.Capacity,keys:o.Keys};if(tab==="numbers")payload={...payload,location:o.Location,phone:o.Phone,notes:o.Notes};if(tab==="companionships")payload={...payload,missionaries:o.Missionaries,notes:o.Notes};const {error}=await db.from(tableMap[tab]).insert(payload);if(error){alert(error.message);return}await loadTable(tab);renderTable(tab);renderAreas()}
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");const tab=t.dataset.tab;document.getElementById("board").classList.toggle("hidden",tab!=="board");document.getElementById("dataViews").classList.toggle("hidden",tab==="board");if(tab!=="board")renderTable(tab)});
-document.getElementById("search").oninput=renderAreas;
-
-function updateMap(){missionSvg.style.transform='translate(calc(-50% + '+mapX+'px), calc(-50% + '+mapY+'px)) scale('+mapScale+')'}
-document.getElementById("zoomIn").onclick=()=>{mapScale=Math.min(2.5,mapScale+.15);updateMap()};
-document.getElementById("zoomOut").onclick=()=>{mapScale=Math.max(.7,mapScale-.15);updateMap()};
-document.getElementById("zoomReset").onclick=()=>{mapScale=1;mapX=0;mapY=0;updateMap()};
-missionSvg.addEventListener("pointerdown",e=>{if(e.target.closest(".zone"))return;dragging=true;startX=e.clientX-mapX;startY=e.clientY-mapY;missionSvg.setPointerCapture(e.pointerId)});
-missionSvg.addEventListener("pointermove",e=>{if(!dragging)return;mapX=e.clientX-startX;mapY=e.clientY-startY;updateMap()});
-missionSvg.addEventListener("pointerup",()=>dragging=false); missionSvg.addEventListener("pointercancel",()=>dragging=false);
-missionSvg.addEventListener("wheel",e=>{e.preventDefault();mapScale=Math.max(.7,Math.min(2.5,mapScale+(e.deltaY<0?.1:-.1)));updateMap()},{passive:false});
-document.getElementById("returnMap").onclick=showMap;
+document.getElementById("search").oninput=renderAreas;document.getElementById("returnMap").onclick=showMap;
 const modal=document.getElementById("modal");
-function openModal(title,fields,onSave){document.getElementById("modalTitle").textContent=title;document.getElementById("formFields").innerHTML=fields.map(f=>'<div class="field"><label>'+f+'</label><input data-field="'+f+'" placeholder="'+f+'"></div>').join("");modal.classList.add("open");document.getElementById("save").onclick=()=>{const o={};document.querySelectorAll("#formFields input").forEach(i=>o[i.dataset.field]=i.value.trim());onSave(o);modal.classList.remove("open")}}
-document.getElementById("cancel").onclick=()=>modal.classList.remove("open");
-document.getElementById("addArea").onclick=()=>openModal("Add teaching area",["Area name","Companionship"],o=>{if(o["Area name"]){areas.push({id:Date.now(),name:o["Area name"],comp:o["Companionship"]});save();renderAreas();renderDetail()}});
-document.getElementById("addRecord").onclick=()=>{const tab=document.querySelector(".tab.active").dataset.tab;openModal("Add "+tab.slice(0,-1),schemas[tab],o=>{data[tab].push(o);renderTable(tab)})};
-renderAreas();renderDetail();showMap();
+function openModal(title,fields,onSave){document.getElementById("modalTitle").textContent=title;document.getElementById("formFields").innerHTML=fields.map(f=>'<div class="field"><label>'+esc(f)+'</label><input data-field="'+esc(f)+'" placeholder="'+esc(f)+'"></div>').join("");modal.classList.add("open");document.getElementById("save").onclick=async()=>{const o={};document.querySelectorAll("#formFields input").forEach(i=>o[i.dataset.field]=i.value.trim());await onSave(o);modal.classList.remove("open")}}
+document.getElementById("cancel").onclick=()=>modal.classList.remove("open");document.getElementById("addArea").onclick=()=>openModal("Add teaching area",["Area name"],addArea);document.getElementById("addRecord").onclick=()=>{const tab=document.querySelector(".tab.active").dataset.tab;openModal("Add "+tab.slice(0,-1),schemas[tab],o=>addRecord(tab,o))};document.getElementById("signIn").onclick=signIn;document.getElementById("signUp").onclick=signUp;boot();
 </script>
 
 <div class="auth-screen" id="authScreen"><div class="auth-box"><div class="mark" style="margin-bottom:16px">FL</div><h2>Mission Logistics Organizer</h2><p id="authIntro">Sign in to access the shared Florida Fort Lauderdale Mission board.</p><div class="field"><label>Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com"></div><div class="field"><label>Password</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div><div class="auth-actions"><button class="btn primary" id="signIn">Sign in</button><button class="btn" id="signUp">Create account</button></div><div class="auth-msg" id="authMsg"></div></div></div></body>
