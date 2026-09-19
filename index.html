@@ -12,7 +12,7 @@ button,input{font:inherit}.app{min-height:100vh}.top{background:var(--navy);colo
 .wrap{max-width:1450px;margin:auto;padding:24px 28px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}.toolbar h2{margin:0;font-size:24px}.actions{display:flex;gap:8px}.btn{border:1px solid var(--line);background:white;border-radius:9px;padding:9px 13px;cursor:pointer;color:var(--ink)}.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
 .grid{display:grid;grid-template-columns:1.05fr 1.55fr;gap:18px}.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}.panel-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.panel-head strong{font-size:14px}.search{border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:190px;background:#fff}.areas{max-height:640px;overflow:auto}.area{padding:15px 17px;border-bottom:1px solid #ece8df;cursor:pointer}.area:hover,.area.selected{background:#f1eee7}.area-row{display:flex;justify-content:space-between;gap:10px}.area-name{font-weight:700}.pill{font-size:11px;padding:4px 7px;border-radius:99px;background:#e9eee9;color:#49675d}.pill.empty{background:#f4e5e1;color:#95584d}.meta{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
 .map-wrap{padding:14px}.map{width:100%;height:520px;background:#e8eee9 url("https://images.squarespace-cdn.com/content/v1/5a53e0e9aeb625417243a665/8d49a720-cdc0-40e3-8e2f-813759c783af/mission%2Bmap.jpg") center/cover no-repeat;border-radius:10px;overflow:hidden;position:relative}.map:before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.12);pointer-events:none}.map svg{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:multiply}.zone{fill:#b8cbbf;stroke:#557567;stroke-width:2;cursor:pointer;opacity:.85}.zone:hover{opacity:1}.zone.unassigned{fill:#ead4cc;stroke:#a85c4c}.label{font-size:12px;fill:#263b34;font-weight:700;pointer-events:none}.map-note{position:absolute;left:12px;bottom:12px;background:rgba(255,255,255,.9);padding:8px 10px;border-radius:8px;font-size:11px;color:var(--muted)}
-.detail{padding:16px 17px}.detail h3{margin:0 0 12px}.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.detail-card{border:1px solid var(--line);border-radius:9px;padding:11px;background:#fff}.detail-card small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}.detail-card b{font-size:13px}
+.detail{padding:16px 17px}.detail h3{margin:0 0 12px}.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.detail-card{border:1px solid var(--line);border-radius:9px;padding:11px;background:#fff}.detail-card small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}.detail-card b{font-size:13px}.workspace-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 17px;border-bottom:1px solid var(--line)}.workspace-head strong{font-size:14px}.workspace{min-height:520px}.area-detail-view{padding:20px}.return-btn{display:inline-flex;align-items:center;gap:6px}.assignment-list{display:grid;gap:10px;margin-top:16px}.assignment-row{display:flex;justify-content:space-between;align-items:center;gap:15px;border:1px solid var(--line);border-radius:10px;padding:14px;background:#fff}.assignment-row small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}.assignment-row b{font-size:14px}.assignment-row .btn{min-width:90px}.area-subtitle{color:var(--muted);font-size:13px}.empty-detail{padding:30px 0;color:var(--muted)}
 .table-panel{margin-top:18px}.table-scroll{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{text-align:left;padding:12px 14px;border-bottom:1px solid #ece8df;white-space:nowrap}.table th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:#faf8f3}.empty{text-align:center;padding:35px;color:var(--muted)}
 .hidden{display:none}.modal{position:fixed;inset:0;background:rgba(21,30,34,.42);display:none;place-items:center;padding:20px}.modal.open{display:grid}.modal-box{background:var(--card);width:min(500px,100%);border-radius:14px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.2)}.modal-box h3{margin-top:0}.field{margin:12px 0}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:5px}.field input{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}.map{height:430px}.top{padding:15px 17px}.wrap{padding:18px}.tabs{padding:0 12px}.toolbar{align-items:flex-start;flex-direction:column}}
@@ -29,7 +29,7 @@ button,input{font:inherit}.app{min-height:100vh}.top{background:var(--navy);colo
 <div class="toolbar"><div><h2>Teaching Areas</h2><div class="meta">A shared view of areas and current assignments.</div></div><div class="actions"><input class="search" id="search" placeholder="Search areas…"><button class="btn primary" id="addArea">+ Add area</button></div></div>
 <div class="grid">
 <div class="panel"><div class="panel-head"><strong>Area list</strong><span id="areaCount" class="meta"></span></div><div class="areas" id="areaList"></div></div>
-<div class="panel"><div class="panel-head"><strong>Mission map</strong><span class="meta">Select a zone</span></div><div class="map-wrap"><div class="map">
+<div class="panel"><div class="workspace-head"><strong id="workspaceTitle">Mission map</strong><div class="actions"><span id="workspaceHint" class="meta">Select an area from the directory or map</span><button class="btn return-btn hidden" id="returnMap">← Return to Map</button></div></div><div class="workspace"><div class="map-wrap" id="mapView"><div class="map">
 <svg viewBox="0 0 900 650" aria-label="Florida mission area map">
 
 <path class="zone" data-area="Fort Lauderdale" d="M610 275 L695 285 L720 335 L680 355 L620 330 Z"/><text class="label" x="628" y="312">Fort Lauderdale</text>
@@ -55,9 +55,8 @@ button,input{font:inherit}.app{min-height:100vh}.top{background:var(--navy);colo
 <path class="zone" data-area="Naples" d="M350 405 L415 395 L430 450 L370 465 Z"/><text class="label" x="375" y="435">Naples</text>
 <path class="zone" data-area="Cape Coral" d="M285 345 L340 350 L355 405 L300 395 Z"/><text class="label" x="295" y="378">Cape Coral</text>
 <path class="zone unassigned" data-area="Homestead" d="M430 450 L500 445 L520 495 L450 505 Z"/><text class="label" x="450" y="480">Homestead</text>
-</svg><div class="map-note">Mission map background · interactive assignment zones layered above.</div></div></div></div>
+</svg><div class="map-note">Mission map background · interactive assignment zones layered above.</div></div></div></div><div id="areaDetailView" class="hidden area-detail-view"></div>
 </div>
-<div class="panel table-panel"><div class="panel-head"><strong>Selected area details</strong><span id="selectedTitle" class="meta">Fort Lauderdale</span></div><div class="detail" id="detail"></div></div>
 </section>
 <section id="dataViews" class="hidden"><div class="toolbar"><div><h2 id="viewTitle"></h2><div class="meta">Manage mission logistics records.</div></div><button class="btn primary" id="addRecord">+ Add record</button></div><div class="panel"><div class="table-scroll"><table class="table"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div></div></section>
 </main>
@@ -75,13 +74,27 @@ function renderAreas(){
  const list=document.getElementById("areaList"); const shown=areas.filter(a=>a.name.toLowerCase().includes(q));
  document.getElementById("areaCount").textContent=areas.length+" areas";
  list.innerHTML=shown.map(a=>'<div class="area '+(a.name===selected?'selected':'')+'" data-name="'+a.name.replaceAll('"','&quot;')+'"><div class="area-row"><span class="area-name">'+a.name+'</span><span class="pill '+(!a.comp?'empty':'')+'">'+(a.comp||"Unassigned")+'</span></div><div class="meta">Car · Phone · Companionship</div></div>').join("");
- list.querySelectorAll(".area").forEach(x=>x.onclick=()=>{selected=x.dataset.name;renderAreas();renderDetail()});
+ list.querySelectorAll(".area").forEach(x=>x.onclick=()=>{selected=x.dataset.name;renderAreas();showAreaDetails()});
 }
 function renderDetail(){
  const a=areas.find(x=>x.name===selected)||{name:selected};
- document.getElementById("selectedTitle").textContent=a.name;
- document.getElementById("detail").innerHTML='<h3>'+a.name+'</h3><div class="detail-grid"><div class="detail-card"><small>Companionship</small><b>'+(a.comp||"Unassigned")+'</b></div><div class="detail-card"><small>Car</small><b>Not assigned</b></div><div class="detail-card"><small>Phone</small><b>Not assigned</b></div><div class="detail-card"><small>House</small><b>Not assigned</b></div></div>';
  document.querySelectorAll(".zone").forEach(z=>z.classList.toggle("unassigned",!areas.find(a=>a.name===z.dataset.area)?.comp));
+}
+function showAreaDetails(){
+ const a=areas.find(x=>x.name===selected)||{name:selected};
+ document.getElementById("mapView").classList.add("hidden");
+ document.getElementById("areaDetailView").classList.remove("hidden");
+ document.getElementById("workspaceTitle").textContent=a.name;
+ document.getElementById("workspaceHint").classList.add("hidden");
+ document.getElementById("returnMap").classList.remove("hidden");
+ document.getElementById("areaDetailView").innerHTML='<div><div class="area-subtitle">Area assignment</div><h2 style="margin:4px 0 0">'+a.name+'</h2></div><div class="assignment-list"><div class="assignment-row"><div><small>Companionship</small><b>'+(a.comp||"Unassigned")+'</b></div><button class="btn">Assign</button></div><div class="assignment-row"><div><small>Car</small><b>'+(a.car||"Unassigned")+'</b></div><button class="btn">Assign</button></div><div class="assignment-row"><div><small>Phone</small><b>'+(a.phone||"Unassigned")+'</b></div><button class="btn">Assign</button></div><div class="assignment-row"><div><small>House</small><b>'+(a.house||"Unassigned")+'</b></div><button class="btn">Assign</button></div></div>';
+}
+function showMap(){
+ document.getElementById("mapView").classList.remove("hidden");
+ document.getElementById("areaDetailView").classList.add("hidden");
+ document.getElementById("workspaceTitle").textContent="Mission map";
+ document.getElementById("workspaceHint").classList.remove("hidden");
+ document.getElementById("returnMap").classList.add("hidden");
 }
 function renderTable(tab){
  document.getElementById("viewTitle").textContent=tab[0].toUpperCase()+tab.slice(1);
@@ -91,13 +104,13 @@ function renderTable(tab){
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");const tab=t.dataset.tab;document.getElementById("board").classList.toggle("hidden",tab!=="board");document.getElementById("dataViews").classList.toggle("hidden",tab==="board");if(tab!=="board")renderTable(tab)});
 document.getElementById("search").oninput=renderAreas;
-document.querySelectorAll(".zone").forEach(z=>z.onclick=()=>{selected=z.dataset.area;renderAreas();renderDetail()});
+document.querySelectorAll(".zone").forEach(z=>z.onclick=()=>{selected=z.dataset.area;renderAreas();showAreaDetails()});\ndocument.getElementById("returnMap").onclick=showMap;
 const modal=document.getElementById("modal");
 function openModal(title,fields,onSave){document.getElementById("modalTitle").textContent=title;document.getElementById("formFields").innerHTML=fields.map(f=>'<div class="field"><label>'+f+'</label><input data-field="'+f+'" placeholder="'+f+'"></div>').join("");modal.classList.add("open");document.getElementById("save").onclick=()=>{const o={};document.querySelectorAll("#formFields input").forEach(i=>o[i.dataset.field]=i.value.trim());onSave(o);modal.classList.remove("open")}}
 document.getElementById("cancel").onclick=()=>modal.classList.remove("open");
 document.getElementById("addArea").onclick=()=>openModal("Add teaching area",["Area name","Companionship"],o=>{if(o["Area name"]){areas.push({id:Date.now(),name:o["Area name"],comp:o["Companionship"]});save();renderAreas();renderDetail()}});
 document.getElementById("addRecord").onclick=()=>{const tab=document.querySelector(".tab.active").dataset.tab;openModal("Add "+tab.slice(0,-1),schemas[tab],o=>{data[tab].push(o);renderTable(tab)})};
-renderAreas();renderDetail();
+renderAreas();renderDetail();showMap();
 </script>
 </body>
 </html>
