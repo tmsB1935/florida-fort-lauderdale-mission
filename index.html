@@ -16,7 +16,8 @@ button,input{font:inherit}.app{min-height:100vh}.top{background:var(--navy);colo
 .table-panel{margin-top:18px}.table-scroll{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{text-align:left;padding:12px 14px;border-bottom:1px solid #ece8df;white-space:nowrap}.table th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:#faf8f3}.empty{text-align:center;padding:35px;color:var(--muted)}
 .hidden{display:none}.modal{position:fixed;inset:0;background:rgba(21,30,34,.42);display:none;place-items:center;padding:20px}.modal.open{display:grid}.modal-box{background:var(--card);width:min(500px,100%);border-radius:14px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.2)}.modal-box h3{margin-top:0}.field{margin:12px 0}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:5px}.field input{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}.map{height:430px}.top{padding:15px 17px}.wrap{padding:18px}.tabs{padding:0 12px}.toolbar{align-items:flex-start;flex-direction:column}}
-</style>
+
+.auth-screen{position:fixed;inset:0;background:var(--paper);display:grid;place-items:center;padding:24px;z-index:50}.auth-box{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:28px}.auth-box h2{margin:0 0 6px}.auth-box p{color:var(--muted);font-size:13px;line-height:1.5}.auth-box .field input{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px}.auth-actions{display:flex;gap:8px;margin-top:16px}.auth-actions .btn{flex:1}.auth-msg{margin-top:12px;font-size:12px;color:var(--muted)}.signout{border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:8px;padding:7px 10px;cursor:pointer;margin-left:10px}.setup-note{margin:14px 0;padding:10px 12px;border:1px solid #e5c8a0;background:#fff7e9;border-radius:9px;font-size:12px;color:#6e5b43}</style>
 </head>
 <body>
 <div class="app">
@@ -98,5 +99,6 @@ document.getElementById("addArea").onclick=()=>openModal("Add teaching area",["A
 document.getElementById("addRecord").onclick=()=>{const tab=document.querySelector(".tab.active").dataset.tab;openModal("Add "+tab.slice(0,-1),schemas[tab],o=>{data[tab].push(o);renderTable(tab)})};
 renderAreas();renderDetail();showMap();
 </script>
-</body>
+
+<div class="auth-screen" id="authScreen"><div class="auth-box"><div class="mark" style="margin-bottom:16px">FL</div><h2>Mission Logistics Organizer</h2><p id="authIntro">Sign in to access the shared Florida Fort Lauderdale Mission board.</p><div class="field"><label>Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com"></div><div class="field"><label>Password</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div><div class="auth-actions"><button class="btn primary" id="signIn">Sign in</button><button class="btn" id="signUp">Create account</button></div><div class="auth-msg" id="authMsg"></div></div></div></body>
 </html>
